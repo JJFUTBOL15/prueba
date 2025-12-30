@@ -3,234 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API - JJMOVIES</title>
+  <title>JJMOVIES - API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f0c1a;
-      --text: #fff;
-      --accent: #c00000;
-      --card-bg: #1a1626;
-      --hover: #2d293b;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-    body { background: var(--bg); color: var(--text); }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { font-size: 32px; margin-bottom: 10px; color: var(--accent); }
-    .search-bar {
-      display: flex;
-      gap: 10px;
-      max-width: 500px;
-      margin: 0 auto 20px;
-    }
-    .search-bar input {
-      flex: 1;
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      background: var(--card-bg);
-      color: white;
-    }
-    .search-bar button {
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-    }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-    .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .card:hover { transform: scale(1.05); }
-    .card img { width: 100%; height: 260px; object-fit: cover; }
-    .card-info { padding: 10px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge {
-      background: var(--accent);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      margin-left: 5px;
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 1000;
-      display: none;
-    }
-    .modal-content {
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 900px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px;
-    }
-    .modal-close { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
-    .embed-code {
-      background: #000;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 14px;
-      color: #00ff00;
-      white-space: pre-wrap;
-      margin: 15px 0;
-    }
-    .preview { text-align: center; margin-top: 15px; }
-    .preview img { max-width: 200px; border-radius: 8px; }
-    .season-ep { display: flex; gap: 10px; margin: 10px 0; }
-    .season-ep input {
-      padding: 6px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; width: 80px;
-    }
-    label { display: block; margin-top: 10px; font-size: 14px; }
+    body { background: #0b1120; color: #cbd5e1; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+    #app * { box-sizing: border-box; }
+    .code-font { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #c00000; border-radius: 4px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal.active { display: flex; }
+    .card { background: #1a1f30; border: 1px solid #2d3748; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+    .card:hover { transform: translateY(-3px); border-color: #c00000; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #1a202c; border: 1px solid #38a169; color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🎬 JJMOVIES - API</h1>
-      <p>Copia el código iframe para embeber en tu sitio</p>
-    </div>
-
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Buscar película o serie..." />
-      <button id="search-btn">🔍</button>
-    </div>
-
-    <div class="grid" id="grid">
-      <!-- Las tarjetas se generarán aquí -->
-    </div>
-  </div>
-
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modal-title">Título</h2>
-        <button class="modal-close" id="modal-close">×</button>
+  <div id="app" class="min-h-screen p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+          <i data-lucide="play" class="text-white w-5 h-5"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-white">JJ<span class="text-red-500">MOVIES</span> - API</h1>
       </div>
 
-      <div id="season-controls" style="display:none;">
-        <div class="season-ep">
-          <div>
-            <label>Temporada</label>
-            <input type="number" id="season" min="1" value="1">
-          </div>
-          <div>
-            <label>Episodio</label>
-            <input type="number" id="episode" min="1" value="1">
-          </div>
+      <!-- Acceso Rápido -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div onclick="switchView('movies')" class="p-4 bg-gray-900/50 rounded-xl border border-gray-700 cursor-pointer hover:border-red-500">
+          <h3 class="text-white font-medium">Películas</h3>
+          <p class="text-gray-400 text-sm">Generar embeds.</p>
+        </div>
+        <div onclick="switchView('series')" class="p-4 bg-gray-900/50 rounded-xl border border-gray-700 cursor-pointer hover:border-purple-500">
+          <h3 class="text-white font-medium">Series</h3>
+          <p class="text-gray-400 text-sm">Generar temporadas.</p>
         </div>
       </div>
 
-      <div class="embed-code" id="embed-code"></div>
+      <!-- Búsqueda -->
+      <div id="search-section" class="mb-6 hidden">
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="absolute left-3 top-3 text-gray-500 w-4 h-4"></i>
+            <input type="text" id="search-input" placeholder="Buscar..." class="w-full bg-gray-900 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-700 focus:border-red-500 focus:outline-none">
+          </div>
+          <button onclick="handleSearch()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium">Buscar</button>
+        </div>
+      </div>
 
-      <div class="preview">
-        <img id="modal-poster" src="" alt="Poster">
+      <!-- Resultados -->
+      <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div class="text-center py-10 text-gray-500">Selecciona una opción arriba.</div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Tu lista de películas y series (reemplázala con tus IDs reales)
-    const contenido = [
-      { id: "83533", title: "Zootopia", poster: "https://image.tmdb.org/t/p/w300/6PnHqKzN9XgQYUjWvL7BpJyVrI.jpg", type: "PELI" },
-      { id: "1084242", title: "Zootopia 2", poster: "https://image.tmdb.org/t/p/w300/hGw7DxuS9CkEzRm41314lY59Z7o.jpg", type: "PELI" },
-      { id: "66732", title: "Stranger Things", poster: "https://image.tmdb.org/t/p/w300/49WJfeN0moxb9IPfFrTwy4djT7Y.jpg", type: "SERIE" },
-      { id: "66733", title: "Westworld", poster: "https://image.tmdb.org/t/p/w300/7Kx53K5QjKz2Xa35XV004607845.jpg", type: "SERIE" },
-      { id: "66734", title: "Black Mirror", poster: "https://image.tmdb.org/t/p/w300/j4J800a25X062Q0K74016485011.jpg", type: "SERIE" },
-      { id: "83534", title: "Avatar: Fuego y ceniza", poster: "https://image.tmdb.org/t/p/w300/5YrMv73s864Q848Z7Kj3Zz71j2i.jpg", type: "PELI" },
-      { id: "83535", title: "Demon Slayer", poster: "https://image.tmdb.org/t/p/w300/mi47Y328G3Z7A66466048934547.jpg", type: "SERIE" },
-      { id: "83536", title: "La Empleada", poster: "https://image.tmdb.org/t/p/w300/1j34Q43Y43528281499Z0a301Xs.jpg", type: "PELI" }
-    ];
-
-    // DOM Elements
-    const grid = document.getElementById('grid');
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalClose = document.getElementById('modal-close');
-    const embedCode = document.getElementById('embed-code');
-    const modalPoster = document.getElementById('modal-poster');
-    const seasonControls = document.getElementById('season-controls');
-    const seasonInput = document.getElementById('season');
-    const episodeInput = document.getElementById('episode');
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-
-    // Funciones
-    function renderContent(items) {
-      grid.innerHTML = '';
-      if (items.length === 0) {
-        grid.innerHTML = '<p style="color:white; text-align:center; width:100%;">No se encontraron resultados.</p>';
-        return;
-      }
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <img src="${item.poster}" alt="${item.title}" />
-          <div class="card-info">
-            <span class="card-title">${item.title}</span>
-            <span class="badge">${item.type}</span>
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="bg-gray-900 border border-gray-700 w-full max-w-4xl max-h-[90vh] rounded-xl flex flex-col overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-gray-800">
+        <h3 id="modal-title" class="text-white font-bold">Título</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-4 flex flex-col lg:flex-row gap-6 overflow-y-auto flex-1">
+        <!-- Preview -->
+        <div class="w-full lg:w-1/2">
+          <label class="block text-xs text-gray-400 mb-2">Vista previa</label>
+          <div class="aspect-video bg-black rounded-lg overflow-hidden border border-gray-700">
+            <div id="preview-iframe" class="w-full h-full"></div>
           </div>
-        `;
-        card.addEventListener('click', () => openModal(item));
-        grid.appendChild(card);
-      });
+        </div>
+        <!-- Config -->
+        <div class="w-full lg:w-1/2 space-y-4">
+          <!-- Series Controls -->
+          <div id="series-controls" class="hidden grid grid-cols-2 gap-3 p-3 bg-gray-800/50 rounded-xl border border-gray-700">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Temporada</label>
+              <input type="number" id="season" value="1" min="1" class="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 text-center" oninput="updateEmbed()">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Episodio</label>
+              <input type="number" id="episode" value="1" min="1" class="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 text-center" oninput="updateEmbed()">
+            </div>
+          </div>
+
+          <!-- Embed Code -->
+          <div>
+            <label class="block text-xs text-gray-400 mb-2">Código HTML</label>
+            <div class="relative group" onclick="copyEmbed()">
+              <code id="embed-code" class="code-font block text-green-400 text-xs break-all bg-gray-950 p-3 rounded border border-gray-800 select-all min-h-[60px] cursor-pointer">...</code>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 transition-opacity">
+                <span class="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold">Copiar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">¡Copiado!</div>
+
+  <script>
+    const DOMAIN = 'https://jjmovies.lat'; // ✅ TU DOMINIO
+    let currentData = { type: 'movie', id: null, title: '', poster: '' };
+
+    lucide.createIcons();
+
+    function switchView(type) {
+      document.getElementById('search-section').classList.remove('hidden');
+      document.getElementById('search-input').placeholder = type === 'movies' ? 'Buscar película...' : 'Buscar serie...';
+      document.getElementById('search-input').dataset.type = type;
     }
 
-    function openModal(item) {
-      modalTitle.textContent = item.title;
-      modalPoster.src = item.poster;
+    async function handleSearch() {
+      const input = document.getElementById('search-input');
+      const query = input.value.trim();
+      const type = input.dataset.type === 'series' ? 'tv' : 'movie';
+      if (!query) return;
 
-      if (item.type === "SERIE") {
-        seasonControls.style.display = 'flex';
-        embedCode.textContent = `<iframe class="aspect-video w-full" src="https://jjmovies.lat/sris.html?serie=${item.id}/1/1" frameborder="0" allowfullscreen></iframe>`;
+      const TMDB_KEY = 'da8b836389708e0558de674492931977';
+      const url = `https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_KEY}&language=es-MX&query=${encodeURIComponent(query)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        renderResults(data.results, type);
+      } catch (e) {
+        document.getElementById('results').innerHTML = `<div class="col-span-full text-center text-red-400">Error al buscar.</div>`;
+      }
+    }
+
+    function renderResults(items, type) {
+      const container = document.getElementById('results');
+      container.innerHTML = items.map(item => {
+        const title = type === 'movie' ? item.title : item.name;
+        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450/1e293b/475569?text=Sin+img';
+        return `
+          <div class="card" onclick="openModal('${type}', '${item.id}', '${title.replace(/'/g, "\\'")}', '${poster}')">
+            <img src="${poster}" class="w-full aspect-[2/3] object-cover" />
+            <div class="p-2">
+              <h4 class="text-white text-xs font-medium truncate">${title}</h4>
+              <span class="text-[8px] bg-red-600 text-white px-1.5 py-0.5 rounded uppercase">${type === 'movie' ? 'PELI' : 'SERIE'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openModal(type, id, title, poster) {
+      currentData = { type, id, title, poster };
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('series-controls').classList.toggle('hidden', type === 'movie');
+      updateEmbed();
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function updateEmbed() {
+      const { type, id } = currentData;
+      let url = '';
+      if (type === 'movie') {
+        url = `${DOMAIN}/player.html?id=${id}`;
       } else {
-        seasonControls.style.display = 'none';
-        embedCode.textContent = `<iframe class="aspect-video w-full" src="https://jjmovies.lat/player.html?id=${item.id}" frameborder="0" allowfullscreen></iframe>`;
+        const s = document.getElementById('season').value;
+        const e = document.getElementById('episode').value;
+        url = `${DOMAIN}/sris.html?serie=${id}/${s}/${e}`;
       }
 
-      modal.style.display = 'flex';
+      const iframeHtml = `<iframe class="aspect-video w-full" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+      document.getElementById('embed-code').textContent = iframeHtml;
+
+      // Vista previa
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.allowFullscreen = true;
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      document.getElementById('preview-iframe').innerHTML = '';
+      document.getElementById('preview-iframe').appendChild(iframe);
     }
 
     function closeModal() {
-      modal.style.display = 'none';
+      document.getElementById('modal').classList.remove('active');
     }
 
-    function searchContent(query) {
-      if (!query.trim()) {
-        renderContent(contenido);
-        return;
-      }
-      const filtered = contenido.filter(item =>
-        item.title.toLowerCase().includes(query.toLowerCase())
-      );
-      renderContent(filtered);
+    function copyEmbed() {
+      const code = document.getElementById('embed-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
     }
 
-    // Event Listeners
-    modalClose.addEventListener('click', closeModal);
-    searchBtn.addEventListener('click', () => searchContent(searchInput.value));
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchContent(searchInput.value);
+    // Permitir Enter en búsqueda
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSearch();
     });
-
-    // Inicialización
-    renderContent(contenido);
   </script>
 </body>
 </html>
